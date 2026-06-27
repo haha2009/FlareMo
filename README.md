@@ -149,6 +149,33 @@ flowchart LR
   Worker -. cache/config only .-> KV["KV: cache and lightweight config"]
 ```
 
+## 本地运行
+
+```bash
+pnpm install
+pnpm db:generate
+pnpm exec wrangler d1 migrations apply flaremo --local
+pnpm dev
+```
+
+本地应用默认运行在 `http://localhost:8787`，由 Wrangler 同时服务
+Workers API 和前端静态资源。
+
+## Cloudflare 部署
+
+FlareMo 使用一个 Worker 承载 API 和前端静态资源，D1 作为主数据库，
+R2 作为附件对象存储。
+
+```bash
+pnpm exec wrangler d1 create flaremo
+pnpm exec wrangler r2 bucket create flaremo-attachments
+pnpm exec wrangler d1 migrations apply flaremo --remote
+pnpm deploy
+```
+
+创建 D1 后需要把真实 `database_id` 写入 `wrangler.jsonc`。线上访问地址
+由 Wrangler 部署输出决定。
+
 ## 建设清单
 
 - [ ] Cloudflare Worker + Vite 应用脚手架

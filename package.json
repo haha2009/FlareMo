@@ -1,0 +1,26 @@
+{
+  "name": "flaremo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "dev": "pnpm --filter @flaremo/web build && pnpm --filter @flaremo/worker dev",
+    "dev:web": "pnpm --filter @flaremo/web dev",
+    "dev:worker": "pnpm --filter @flaremo/worker dev",
+    "build": "pnpm -r build",
+    "check": "pnpm -r check",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:generate": "drizzle-kit generate",
+    "deploy": "pnpm --filter @flaremo/web build && pnpm --filter @flaremo/worker deploy"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
+    "@cloudflare/workers-types": "^4.20260627.1",
+    "drizzle-kit": "^0.31.8",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.0",
+    "wrangler": "^4.105.0"
+  }
+}
