@@ -10,6 +10,8 @@ FlareMo 部署到 Cloudflare Workers。Worker 同时承载前端静态资源和 
 
 公开入口的实测记录见 [deploy-button-test.md](./deploy-button-test.md)。
 
+如果 Cloudflare Dashboard 还没有连接 GitHub 或 GitLab provider，创建页会先提示 `Connect a Git account to continue.`。这是 Cloudflare Workers Builds 的 Git 集成前置条件。
+
 一键部署完成后还要做两件事：
 
 - 在 Cloudflare Access 里保护 Worker 域名或自定义域名。

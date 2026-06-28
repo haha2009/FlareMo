@@ -101,6 +101,8 @@ FlareMo 的部署被刻意做得很轻。两种方式，挑一种就行。
 pnpm migrate:remote
 ```
 
+如果你的 Cloudflare Dashboard 还没有连接 GitHub 或 GitLab，Cloudflare 会先要求连接 Git provider。这个 OAuth 授权由你在 Cloudflare 页面里确认，FlareMo 不会要求应用内 token。
+
 **方式二：让 AI Agent 替你部署**
 
 仓库里带了一份 [docs/agent-deploy.md](./docs/agent-deploy.md)，是写给 Codex / Claude Code / Cursor 这类 Agent 用的部署 runbook。把仓库交给一个能跑命令的 Agent，它就能按 runbook 创建 D1 / R2 资源、填写 `database_id`、跑迁移、部署。你不用记命令，Agent 自己按步骤来。
