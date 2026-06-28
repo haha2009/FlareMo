@@ -9,6 +9,11 @@
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/realchendahuang/FlareMo)
 
+<p>
+  <img src="./docs/assets/flaremo-desktop.png" alt="FlareMo desktop timeline" width="720">
+  <img src="./docs/assets/flaremo-mobile.png" alt="FlareMo mobile timeline" width="220">
+</p>
+
 ---
 
 ## 为什么做这个项目
@@ -98,7 +103,7 @@ pnpm migrate:remote
 
 **方式二：让 AI Agent 替你部署**
 
-仓库里带了一份 `[docs/agent-deploy.md](./docs/agent-deploy.md)`，是写给 Codex / Claude Code / Cursor 这类 Agent 用的部署 runbook。把仓库交给一个能跑命令的 Agent，它就能按 runbook 创建 D1 / R2 资源、填写 `database_id`、跑迁移、部署。你不用记命令，Agent 自己按步骤来。
+仓库里带了一份 [docs/agent-deploy.md](./docs/agent-deploy.md)，是写给 Codex / Claude Code / Cursor 这类 Agent 用的部署 runbook。把仓库交给一个能跑命令的 Agent，它就能按 runbook 创建 D1 / R2 资源、填写 `database_id`、跑迁移、部署。你不用记命令，Agent 自己按步骤来。
 
 **手动部署**（想自己一步步来的话）先创建资源：
 
@@ -116,7 +121,7 @@ pnpm migrate:remote
 pnpm deploy
 ```
 
-完整部署说明见 [docs/deploy.md](./docs/deploy.md)。
+完整部署说明见 [docs/deploy.md](./docs/deploy.md)。Deploy Button 的实测记录见 [docs/deploy-button-test.md](./docs/deploy-button-test.md)。
 
 ---
 
@@ -256,6 +261,16 @@ FlareMo 当前已经具备：
 pnpm verify
 pnpm deploy:dry-run
 ```
+
+常用维护命令：
+
+```bash
+pnpm screenshots
+pnpm backup:drill
+pnpm release v0.1.1
+```
+
+`pnpm verify` 会跑类型检查、Vitest、生产构建和 Playwright E2E。Memos 兼容面有独立的 Worker contract test，覆盖 DTO shape、附件导入导出和 OpenAPI 路径。截图由 `pnpm screenshots` 从本地 Worker 实例生成，README 里的图片不是设计稿。
 
 发版规则见 [docs/release.md](./docs/release.md)。维护手册见 [docs/maintenance.md](./docs/maintenance.md)。贡献说明见 [CONTRIBUTING.md](./CONTRIBUTING.md)。安全策略见 [SECURITY.md](./SECURITY.md)。
 

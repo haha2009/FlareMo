@@ -2,7 +2,9 @@
 node_modules/
 dist/
 .wrangler/
+.wrangler-screenshots/
 .dev.vars*
 *.tsbuildinfo
 test-results/
 playwright-report/
+backups/

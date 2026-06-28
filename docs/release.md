@@ -17,6 +17,7 @@ FlareMo 使用 Git tag 和 GitHub Release 发布版本。项目不依赖 GitHub 
 ```bash
 pnpm verify
 pnpm deploy:dry-run
+pnpm backup:drill
 ```
 
 涉及数据库变更时，还要检查：
@@ -43,17 +44,13 @@ pnpm deploy
 
 ## 发版命令
 
-确认版本号后：
+确认版本号后运行：
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
-gh release create v0.1.0 \
-  --title "v0.1.0" \
-  --notes-file CHANGELOG.md
+pnpm release v0.1.1
 ```
 
-如果 `CHANGELOG.md` 包含多个版本，不要直接整份作为 release notes。先准备只包含当前版本的 notes 文件。
+发布脚本会检查工作树、确认 `HEAD` 已经推到 `origin/main`、提取 `CHANGELOG.md` 中对应版本的 release notes、执行 `pnpm verify` 和 `pnpm deploy:dry-run`，然后创建 tag 和 GitHub Release。
 
 ## 回滚
 

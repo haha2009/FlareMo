@@ -65,6 +65,7 @@ export async function importData(
   const now = new Date().toISOString();
   const memoIdMap = new Map<string, string>();
   let importedMemos = 0;
+  let importedAttachments = 0;
   let importedRelations = 0;
   let importedShares = 0;
 
@@ -106,6 +107,7 @@ export async function importData(
       updatedAt: now,
       deletedAt: null,
     });
+    importedAttachments += 1;
   }
 
   for (const relation of bundle.relations) {
@@ -144,6 +146,7 @@ export async function importData(
 
   return {
     imported_memos: importedMemos,
+    imported_attachments: importedAttachments,
     imported_relations: importedRelations,
     imported_shares: importedShares,
   };

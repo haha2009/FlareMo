@@ -1,6 +1,6 @@
 {
   "name": "flaremo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.7.0",
@@ -14,6 +14,9 @@
     "test": "pnpm -r test",
     "test:e2e": "playwright test",
     "verify": "node ./scripts/preflight.mjs",
+    "release": "node ./scripts/release.mjs",
+    "backup:drill": "node ./scripts/backup-drill.mjs",
+    "screenshots": "node ./scripts/capture-screenshots.mjs",
     "db:generate": "drizzle-kit generate",
     "migrate:local": "wrangler d1 migrations apply DB --local",
     "migrate:remote": "wrangler d1 migrations apply DB --remote",

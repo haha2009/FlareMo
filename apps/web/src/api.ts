@@ -182,7 +182,12 @@ export async function exportData() {
 }
 
 export async function importData(bundle: unknown) {
-  return apiRequest<{ imported_memos: number; imported_relations: number; imported_shares: number }>("/api/v1/import", {
+  return apiRequest<{
+    imported_memos: number;
+    imported_attachments: number;
+    imported_relations: number;
+    imported_shares: number;
+  }>("/api/v1/import", {
     method: "POST",
     body: JSON.stringify(bundle),
   });

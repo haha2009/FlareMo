@@ -22,6 +22,7 @@ pnpm check
 pnpm test
 pnpm build
 pnpm verify
+pnpm backup:drill
 ```
 
 本地开发：

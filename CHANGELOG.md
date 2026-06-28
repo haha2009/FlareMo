@@ -2,6 +2,31 @@
 
 FlareMo 使用 SemVer。每个 release 都要写清楚升级影响、Cloudflare 资源变化和 Memos 兼容面变化。
 
+## v0.1.1
+
+开源项目基础设施补强版本。这个版本不改变部署架构，重点是让仓库首页、验证脚本、备份演练、兼容测试和发版流程更可信。
+
+### 已包含
+
+- README 增加真实桌面端和移动端截图，截图由 `pnpm screenshots` 从本地 Worker 实例生成。
+- 增加 `pnpm release <version>`，本地完成工作树、远端 main、tag、`pnpm verify`、`pnpm deploy:dry-run` 和 GitHub Release 检查。
+- 增加 `pnpm backup:drill`，覆盖本地 D1 导出、隔离恢复、恢复后 schema 查询、远端 migration 检查和 R2 bucket 检查。
+- 增加 Memos-compatible Worker contract test，覆盖 memo DTO shape、附件 export/import roundtrip 和 OpenAPI 路径。
+- `POST /api/v1/import` 返回值增加 `imported_attachments`，导入结果不再只统计 memo、relation 和 share。
+- README、维护文档、发版文档补齐截图、备份演练、发版脚本和兼容测试说明。
+
+### 约束
+
+- 项目仍不使用 GitHub Actions 作为 CI。
+- D1 仍是事实源，R2 仍只保存附件、导出包和对象文件。
+- Cloudflare Access 仍是生产访问边界，不增加应用内 Bearer token 登录。
+
+### 升级说明
+
+- 不需要新增 Cloudflare 资源。
+- 不需要执行新的 D1 migration。
+- 从旧版本升级代码后执行 `pnpm verify` 和 `pnpm deploy:dry-run`，确认通过后再部署。
+
 ## v0.1.0
 
 首个公开可部署版本。这个版本把 FlareMo 收口成 Cloudflare-native、Memos-compatible 的自托管笔记系统，并补齐开源项目所需的部署、协作、Agent、发版和安全文档。

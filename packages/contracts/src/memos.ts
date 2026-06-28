@@ -152,6 +152,7 @@ export const importBundleSchema = z.object({
 
 export const importResultSchema = z.object({
   imported_memos: z.number().int().nonnegative(),
+  imported_attachments: z.number().int().nonnegative(),
   imported_relations: z.number().int().nonnegative(),
   imported_shares: z.number().int().nonnegative(),
 });

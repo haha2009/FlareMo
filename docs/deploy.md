@@ -8,6 +8,8 @@ FlareMo 部署到 Cloudflare Workers。Worker 同时承载前端静态资源和 
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/realchendahuang/FlareMo)
 
+公开入口的实测记录见 [deploy-button-test.md](./deploy-button-test.md)。
+
 一键部署完成后还要做两件事：
 
 - 在 Cloudflare Access 里保护 Worker 域名或自定义域名。
