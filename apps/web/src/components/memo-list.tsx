@@ -1,6 +1,7 @@
 import type { Attachment, Memo, MemoVisibility, Share } from "@/api";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useI18n } from "@/i18n";
 import { MemoCard } from "./memo-card";
 import { InboxIcon } from "lucide-react";
 
@@ -31,6 +32,8 @@ export function MemoList({
   onRestore,
   onHardDelete,
 }: MemoListProps) {
+  const { t } = useI18n();
+
   if (isLoading) {
     return (
       <div className="flex flex-col gap-3">
@@ -48,8 +51,8 @@ export function MemoList({
           <EmptyMedia variant="icon">
             <InboxIcon />
           </EmptyMedia>
-          <EmptyTitle>这里还没有内容</EmptyTitle>
-          <EmptyDescription>换个筛选条件，或者先写下一条记录。</EmptyDescription>
+          <EmptyTitle>{t("list.emptyTitle")}</EmptyTitle>
+          <EmptyDescription>{t("list.emptyDescription")}</EmptyDescription>
         </EmptyHeader>
       </Empty>
     );

@@ -2,6 +2,7 @@ import type { Memo } from "@/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n";
 import { extractTags } from "@/lib/memo";
 import { cn } from "@/lib/utils";
 import { HashIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
@@ -23,6 +24,7 @@ export function FlareMoExplorer({
   onQueryChange,
   onTagChange,
 }: FlareMoExplorerProps) {
+  const { t } = useI18n();
   const stats = getStats(memos);
   const activity = getActivity(memos);
   const hasFilters = Boolean(query.trim() || activeTag);
@@ -34,7 +36,7 @@ export function FlareMoExplorer({
           <SearchIcon className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             className="h-8 rounded-lg pl-8"
-            placeholder="搜索"
+            placeholder={t("common.search")}
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
           />
@@ -42,31 +44,31 @@ export function FlareMoExplorer({
         {hasFilters && (
           <Button className="mt-2 w-full justify-start" size="sm" variant="ghost" onClick={() => resetFilters(onQueryChange, onTagChange)}>
             <RotateCcwIcon />
-            清除筛选
+            {t("common.clearFilters")}
           </Button>
         )}
       </section>
 
       <section className="rounded-lg border bg-card p-3">
-        <div className="mb-3 text-sm font-medium text-muted-foreground">概览</div>
+        <div className="mb-3 text-sm font-medium text-muted-foreground">{t("explorer.overview")}</div>
         <div className="grid grid-cols-3 gap-2 text-center">
-          <StatCell label="记录" value={stats.total} />
-          <StatCell label="标签" value={stats.tags} />
-          <StatCell label="字数" value={stats.words} />
+          <StatCell label={t("explorer.records")} value={stats.total} />
+          <StatCell label={t("explorer.tags")} value={stats.tags} />
+          <StatCell label={t("explorer.words")} value={stats.words} />
         </div>
       </section>
 
       <section className="rounded-lg border bg-card p-3">
         <div className="mb-3 flex items-center justify-between gap-2">
-          <div className="text-sm font-medium text-muted-foreground">热力图</div>
-          <span className="text-xs text-muted-foreground">最近 12 周</span>
+          <div className="text-sm font-medium text-muted-foreground">{t("explorer.heatmap")}</div>
+          <span className="text-xs text-muted-foreground">{t("explorer.recentWeeks")}</span>
         </div>
         <div className="flex gap-1">
           {activity.map((week) => (
             <div className="flex flex-1 flex-col gap-1" key={week.key}>
               {week.days.map((day) => (
                 <button
-                  aria-label={`${day.date}: ${day.count}`}
+                  aria-label={t("explorer.heatmapDay", { count: day.count, date: day.date })}
                   className={cn("aspect-square rounded-[2px] transition-opacity hover:opacity-80", heatmapColor(day.count))}
                   key={day.date}
                   type="button"
@@ -79,10 +81,10 @@ export function FlareMoExplorer({
 
       <section className="rounded-lg border bg-card p-3">
         <div className="mb-3 flex items-center justify-between gap-2">
-          <div className="text-sm font-medium text-muted-foreground">标签</div>
+          <div className="text-sm font-medium text-muted-foreground">{t("explorer.tags")}</div>
           {activeTag && (
             <Button size="sm" variant="ghost" onClick={() => onTagChange(undefined)}>
-              全部
+              {t("explorer.all")}
             </Button>
           )}
         </div>
@@ -113,7 +115,7 @@ export function FlareMoExplorer({
             })}
           </div>
         ) : (
-          <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">还没有标签</div>
+          <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">{t("explorer.noTags")}</div>
         )}
       </section>
     </aside>

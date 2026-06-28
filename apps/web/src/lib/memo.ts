@@ -12,10 +12,10 @@ export function extractTags(content: string) {
   return [...tags];
 }
 
-export function formatMemoTime(value: string) {
+export function formatMemoTime(value: string, locale?: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
     hour: "2-digit",

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useI18n } from "@/i18n";
 import { extractTags, formatMemoTime, getMemoResourceId } from "@/lib/memo";
 import { cn } from "@/lib/utils";
 import {
@@ -56,6 +57,7 @@ export function MemoCard({
   share,
   shareUrl,
 }: MemoCardProps) {
+  const { locale, t } = useI18n();
   const id = getMemoResourceId(memo);
   const tags = memo.payload.tags ?? extractTags(memo.content);
   const isTrashed = memo.state === "trashed";
@@ -77,14 +79,14 @@ export function MemoCard({
           onClick={() => onArchive(id)}
         >
           {memo.pinned ? <PinIcon className="text-primary" /> : <CircleIcon className="opacity-40" />}
-          <span className="truncate">{formatMemoTime(memo.display_time)}</span>
+          <span className="truncate">{formatMemoTime(memo.display_time, locale)}</span>
         </button>
         <div className="flex shrink-0 items-center gap-1">
           {memo.visibility !== "private" && <VisibilityBadge visibility={memo.visibility} />}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                aria-label="操作"
+                aria-label={t("common.actions")}
                 className="opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 size="icon-sm"
                 variant="ghost"
@@ -97,35 +99,35 @@ export function MemoCard({
                 {isTrashed ? (
                   <DropdownMenuItem onClick={() => onRestore(id)}>
                     <RotateCcwIcon />
-                    恢复
+                    {t("memo.restore")}
                   </DropdownMenuItem>
                 ) : (
                   <>
                     <DropdownMenuItem onClick={() => setIsEditing(true)}>
                       <Edit3Icon />
-                      编辑
+                      {t("common.edit")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onPin(id, !memo.pinned)}>
                       <PinIcon />
-                      {memo.pinned ? "取消置顶" : "置顶"}
+                      {memo.pinned ? t("memo.unpin") : t("memo.pin")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onArchive(id)}>
                       <ArchiveIcon />
-                      {memo.state === "archived" ? "移回时间线" : "归档"}
+                      {memo.state === "archived" ? t("memo.moveToTimeline") : t("view.archive")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onShare(id)}>
                       <Share2Icon />
-                      分享
+                      {t("memo.share")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onTrash(id)}>
                       <Trash2Icon />
-                      移到回收站
+                      {t("memo.moveToTrash")}
                     </DropdownMenuItem>
                   </>
                 )}
                 <DropdownMenuItem variant="destructive" onClick={() => onHardDelete(id)}>
                   <Trash2Icon />
-                  彻底删除
+                  {t("memo.deleteForever")}
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -167,7 +169,7 @@ export function MemoCard({
             ))}
           </div>
           <div className="ml-auto flex items-center gap-2">
-            {memo.state !== "normal" && <Badge variant="outline">{stateLabel(memo.state)}</Badge>}
+            {memo.state !== "normal" && <Badge variant="outline">{stateLabel(memo.state, t)}</Badge>}
             {memo.visibility === "private" && <VisibilityBadge visibility={memo.visibility} />}
           </div>
         </footer>
@@ -175,7 +177,7 @@ export function MemoCard({
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>编辑</DialogTitle>
+            <DialogTitle>{t("common.edit")}</DialogTitle>
           </DialogHeader>
           <Textarea
             className="min-h-40 resize-none text-base"
@@ -191,9 +193,9 @@ export function MemoCard({
             size="sm"
             variant="outline"
           >
-            <ToggleGroupItem value="private">私密</ToggleGroupItem>
-            <ToggleGroupItem value="protected">受保护</ToggleGroupItem>
-            <ToggleGroupItem value="public">公开</ToggleGroupItem>
+            <ToggleGroupItem value="private">{t("visibility.private")}</ToggleGroupItem>
+            <ToggleGroupItem value="protected">{t("visibility.protected")}</ToggleGroupItem>
+            <ToggleGroupItem value="public">{t("visibility.public")}</ToggleGroupItem>
           </ToggleGroup>
           <DialogFooter>
             <Button
@@ -203,7 +205,7 @@ export function MemoCard({
                 setIsEditing(false);
               }}
             >
-              保存
+              {t("common.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -227,9 +229,15 @@ function formatBytes(size: number) {
 }
 
 function VisibilityBadge({ visibility }: { visibility: MemoVisibility }) {
+  const { t } = useI18n();
   const icon =
     visibility === "public" ? <Globe2Icon /> : visibility === "protected" ? <ShieldIcon /> : <LockIcon />;
-  const label = visibility === "public" ? "公开" : visibility === "protected" ? "受保护" : "私密";
+  const label =
+    visibility === "public"
+      ? t("visibility.public")
+      : visibility === "protected"
+        ? t("visibility.protected")
+        : t("visibility.private");
   return (
     <Badge className="rounded-md" variant="outline">
       {icon}
@@ -238,14 +246,14 @@ function VisibilityBadge({ visibility }: { visibility: MemoVisibility }) {
   );
 }
 
-function stateLabel(state: MemoState) {
+function stateLabel(state: MemoState, t: ReturnType<typeof useI18n>["t"]) {
   switch (state) {
     case "archived":
-      return "已归档";
+      return t("memo.stateArchived");
     case "trashed":
-      return "回收站";
+      return t("memo.stateTrashed");
     case "deleted":
-      return "已删除";
+      return t("memo.stateDeleted");
     default:
       return state;
   }

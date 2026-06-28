@@ -23,14 +23,16 @@ import { Input } from "@/components/ui/input";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useI18n, type TranslationKey } from "@/i18n";
 import { extractTags, formatMemoTime, getAllTags } from "@/lib/memo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createRootRoute, createRoute, createRouter, Outlet, RouterProvider } from "@tanstack/react-router";
-import { DownloadIcon, FileIcon, SearchIcon, UploadIcon } from "lucide-react";
+import { DownloadIcon, FileIcon, LanguagesIcon, SearchIcon, UploadIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 function FlareMoApp() {
+  const { t, toggleLocale } = useI18n();
   const queryClient = useQueryClient();
   const [view, setView] = useState<ViewMode>("all");
   const [activeTag, setActiveTag] = useState<string | undefined>();
@@ -70,7 +72,7 @@ function FlareMoApp() {
   const invalidateAttachments = () => queryClient.invalidateQueries({ queryKey: ["attachments"] });
   const handleMutationError = (error: Error) => {
     if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
-      toast.error("需要通过 Cloudflare Access 访问");
+      toast.error(t("toast.accessRequired"));
       return;
     }
     toast.error(error.message);
@@ -84,7 +86,7 @@ function FlareMoApp() {
       files: File[];
     }) => {
       const memo = await createMemo({
-        content: input.content || "未命名附件",
+        content: input.content || t("toast.untitledAttachment"),
         visibility: input.visibility,
         payload: { tags: input.tags },
         source: "web",
@@ -99,7 +101,7 @@ function FlareMoApp() {
       return memo;
     },
     onSuccess: () => {
-      toast.success("已保存");
+      toast.success(t("toast.saved"));
       void invalidateMemos();
       void invalidateAttachments();
     },
@@ -109,7 +111,7 @@ function FlareMoApp() {
   const trashMutation = useMutation({
     mutationFn: trashMemo,
     onSuccess: () => {
-      toast.success("已移到回收站");
+      toast.success(t("toast.movedToTrash"));
       void invalidateMemos();
     },
     onError: handleMutationError,
@@ -118,7 +120,7 @@ function FlareMoApp() {
   const restoreMutation = useMutation({
     mutationFn: (id: string) => updateMemo(id, { status: "normal" }),
     onSuccess: () => {
-      toast.success("已恢复");
+      toast.success(t("toast.restored"));
       void invalidateMemos();
     },
     onError: handleMutationError,
@@ -127,7 +129,7 @@ function FlareMoApp() {
   const updateMutation = useMutation({
     mutationFn: ({ id, input }: { id: string; input: Parameters<typeof updateMemo>[1] }) => updateMemo(id, input),
     onSuccess: () => {
-      toast.success("已更新");
+      toast.success(t("toast.updated"));
       void invalidateMemos();
     },
     onError: handleMutationError,
@@ -136,7 +138,7 @@ function FlareMoApp() {
   const hardDeleteMutation = useMutation({
     mutationFn: hardDeleteMemo,
     onSuccess: () => {
-      toast.success("已删除");
+      toast.success(t("toast.deleted"));
       void invalidateMemos();
       void invalidateAttachments();
     },
@@ -147,7 +149,7 @@ function FlareMoApp() {
     mutationFn: createShare,
     onSuccess: (share) => {
       setSharesByMemo((current) => new Map(current).set(share.memo, share));
-      toast.success("已创建分享");
+      toast.success(t("toast.shareCreated"));
     },
     onError: handleMutationError,
   });
@@ -155,7 +157,7 @@ function FlareMoApp() {
   const importMutation = useMutation({
     mutationFn: importData,
     onSuccess: (result) => {
-      toast.success(`已导入 ${result.imported_memos} 条`);
+      toast.success(t("toast.imported", { count: result.imported_memos }));
       void invalidateMemos();
       void invalidateAttachments();
     },
@@ -188,11 +190,22 @@ function FlareMoApp() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="hidden h-4 w-1 rounded-full bg-primary md:block" />
-                    <div className="truncate font-heading text-base font-semibold">{viewTitle(view)}</div>
+                    <div className="truncate font-heading text-base font-semibold">{viewTitle(view, t)}</div>
                   </div>
                 </div>
                 <Button
-                  aria-label="导出"
+                  aria-label={t("language.toggle")}
+                  className="w-14 px-2"
+                  size="sm"
+                  title={t("language.toggle")}
+                  variant="ghost"
+                  onClick={toggleLocale}
+                >
+                  <LanguagesIcon data-icon="inline-start" />
+                  <span className="text-xs font-medium">{t("language.next")}</span>
+                </Button>
+                <Button
+                  aria-label={t("common.export")}
                   size="icon"
                   variant="ghost"
                   onClick={async () => {
@@ -209,7 +222,7 @@ function FlareMoApp() {
                   <DownloadIcon />
                 </Button>
                 <Button asChild size="icon" variant="ghost">
-                  <label aria-label="导入">
+                  <label aria-label={t("common.import")}>
                     <UploadIcon />
                     <Input
                       accept="application/json"
@@ -229,7 +242,7 @@ function FlareMoApp() {
                   <SearchIcon className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     className="h-8 pl-8"
-                    placeholder="搜索"
+                    placeholder={t("common.search")}
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                   />
@@ -243,7 +256,7 @@ function FlareMoApp() {
                     <SearchIcon className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       className="h-8 pl-8"
-                      placeholder="搜索"
+                      placeholder={t("common.search")}
                       value={query}
                       onChange={(event) => setQuery(event.target.value)}
                     />
@@ -263,7 +276,7 @@ function FlareMoApp() {
                           setQuery("");
                         }}
                       >
-                        清除筛选
+                        {t("common.clearFilters")}
                       </button>
                     </div>
                   )}
@@ -317,14 +330,14 @@ function FlareMoApp() {
   );
 }
 
-function viewTitle(view: ViewMode) {
+function viewTitle(view: ViewMode, t: (key: TranslationKey) => string) {
   switch (view) {
     case "archived":
-      return "归档";
+      return t("view.archive");
     case "trashed":
-      return "回收站";
+      return t("view.trash");
     default:
-      return "时间线";
+      return t("view.timeline");
   }
 }
 
@@ -339,6 +352,7 @@ const indexRoute = createRoute({
 });
 
 function PublicSharePage() {
+  const { locale, t } = useI18n();
   const { token } = shareRoute.useParams();
   const shareQuery = useQuery({
     queryKey: ["public-share", token],
@@ -352,13 +366,13 @@ function PublicSharePage() {
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-4">
         <header className="border-b pb-4">
           <div className="font-heading text-lg font-semibold">FlareMo</div>
-          <div className="text-sm text-muted-foreground">分享</div>
+          <div className="text-sm text-muted-foreground">{t("share.title")}</div>
         </header>
-        {shareQuery.isLoading && <div className="rounded-md border p-6 text-sm text-muted-foreground">加载中...</div>}
-        {shareQuery.isError && <div className="rounded-md border p-6 text-sm text-muted-foreground">分享不可用。</div>}
+        {shareQuery.isLoading && <div className="rounded-md border p-6 text-sm text-muted-foreground">{t("common.loading")}</div>}
+        {shareQuery.isError && <div className="rounded-md border p-6 text-sm text-muted-foreground">{t("share.unavailable")}</div>}
         {share && (
           <article className="rounded-md border bg-card p-5 shadow-sm">
-            <div className="mb-4 text-sm text-muted-foreground">{formatMemoTime(share.memo.display_time)}</div>
+            <div className="mb-4 text-sm text-muted-foreground">{formatMemoTime(share.memo.display_time, locale)}</div>
             <div className="whitespace-pre-wrap text-base leading-7">{share.memo.content}</div>
             {tags.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">

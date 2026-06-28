@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useI18n } from "@/i18n";
 import { ArchiveIcon, InboxIcon, Trash2Icon } from "lucide-react";
 
 export type MemoView = "all" | "archived" | "trashed";
@@ -29,6 +30,8 @@ export function FlareMoSidebar({
   archivedCount,
   trashedCount,
 }: FlareMoSidebarProps) {
+  const { t } = useI18n();
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
@@ -41,13 +44,13 @@ export function FlareMoSidebar({
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>导航</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("sidebar.navigation")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton isActive={activeView === "all"} onClick={() => onViewChange("all")}>
                   <InboxIcon />
-                  <span>时间线</span>
+                  <span>{t("view.timeline")}</span>
                   <Badge className="ml-auto" variant="secondary">
                     {memoCount}
                   </Badge>
@@ -56,7 +59,7 @@ export function FlareMoSidebar({
               <SidebarMenuItem>
                 <SidebarMenuButton isActive={activeView === "archived"} onClick={() => onViewChange("archived")}>
                   <ArchiveIcon />
-                  <span>归档</span>
+                  <span>{t("view.archive")}</span>
                   <Badge className="ml-auto" variant="outline">
                     {archivedCount}
                   </Badge>
@@ -65,7 +68,7 @@ export function FlareMoSidebar({
               <SidebarMenuItem>
                 <SidebarMenuButton isActive={activeView === "trashed"} onClick={() => onViewChange("trashed")}>
                   <Trash2Icon />
-                  <span>回收站</span>
+                  <span>{t("view.trash")}</span>
                   <Badge className="ml-auto" variant="outline">
                     {trashedCount}
                   </Badge>
