@@ -131,6 +131,12 @@ export const createShareSchema = z.object({
   expires_at: z.string().datetime().nullable().optional(),
 });
 
+export const publicShareDtoSchema = z.object({
+  share: shareDtoSchema.omit({ token: true }),
+  memo: memoDtoSchema,
+  attachments: z.array(attachmentDtoSchema),
+});
+
 export const exportAttachmentSchema = attachmentDtoSchema.omit({ download_url: true }).extend({
   data_base64: z.string().optional(),
 });
@@ -162,6 +168,7 @@ export type MemoRelationDto = z.infer<typeof memoRelationDtoSchema>;
 export type PatchMemoRelationsInput = z.infer<typeof patchMemoRelationsSchema>;
 export type ShareDto = z.infer<typeof shareDtoSchema>;
 export type CreateShareInput = z.infer<typeof createShareSchema>;
+export type PublicShareDto = z.infer<typeof publicShareDtoSchema>;
 export type ExportAttachment = z.infer<typeof exportAttachmentSchema>;
 export type ImportBundle = z.infer<typeof importBundleSchema>;
 export type ImportResult = z.infer<typeof importResultSchema>;

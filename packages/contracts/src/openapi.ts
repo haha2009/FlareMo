@@ -11,6 +11,7 @@ import {
   listMemoRelationsResponseSchema,
   memoDtoSchema,
   patchMemoRelationsSchema,
+  publicShareDtoSchema,
   shareDtoSchema,
   updateMemoSchema,
 } from "./memos";
@@ -121,6 +122,7 @@ const schemas = {
   ListMemosResponse: toJSONSchema(listMemosResponseSchema) as JsonSchema,
   Memo: toJSONSchema(memoDtoSchema) as JsonSchema,
   PatchMemoRelationsRequest: toJSONSchema(patchMemoRelationsSchema) as JsonSchema,
+  PublicShare: toJSONSchema(publicShareDtoSchema) as JsonSchema,
   Share: toJSONSchema(shareDtoSchema) as JsonSchema,
   UpdateMemoRequest: toJSONSchema(updateMemoSchema) as JsonSchema,
 };
@@ -237,6 +239,15 @@ export function createOpenApiDocument() {
           tags: ["Shares"],
           parameters: [shareTokenParam],
           responses: { "200": jsonResponse("Share.", schemas.Share) },
+        }),
+      },
+      "/api/public/shares/{token}": {
+        get: operation({
+          operationId: "getPublicShare",
+          summary: "Get public share content by token",
+          tags: ["Shares"],
+          parameters: [{ name: "token", in: "path", required: true, schema: { type: "string" } }],
+          responses: { "200": jsonResponse("Public share content.", schemas.PublicShare) },
         }),
       },
       "/api/v1/attachments": {

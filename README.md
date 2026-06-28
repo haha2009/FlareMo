@@ -210,6 +210,15 @@ curl "$FLAREMO_URL/api/v1/mcp" \
 应用内的 Bearer token。生产实例应该在 Access policy 中用
 `service_token` selector 明确允许该 token。
 
+公开分享路径需要单独配置 Access bypass：
+
+- `/share/*`
+- `/api/public/shares/*`
+
+这两个路径允许未登录访问者打开分享内容，但仍由 FlareMo 的 share
+token、过期时间和 memo 状态校验控制。其他 API 和前端入口继续放在
+Cloudflare Access 之后。
+
 ## 建设清单
 
 - [x] Cloudflare Worker + Vite 应用脚手架

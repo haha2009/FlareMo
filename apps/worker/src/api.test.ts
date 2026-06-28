@@ -142,6 +142,61 @@ describe("FlareMo Worker API", () => {
     );
     expect(result.imported_memos).toBeGreaterThanOrEqual(2);
   });
+
+  it("serves public share content and attachments by token only", async () => {
+    const memo = await createMemo("shareable memo #public");
+    const formData = new FormData();
+    formData.set("memo", memo.name);
+    formData.set("file", new File(["shared attachment"], "shared.txt", { type: "text/plain" }));
+    const attachment = await json(
+      await fetchApp("http://flaremo.test/api/v1/attachments", {
+        method: "POST",
+        body: formData,
+      }),
+    );
+
+    const share = await json(
+      await fetchApp(`http://flaremo.test/api/v1/${memo.name}/shares`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({}),
+      }),
+    );
+
+    const publicShare = await json(await fetchApp(`http://flaremo.test/api/public/shares/${share.token}`));
+    expect(publicShare.memo.content).toBe("shareable memo #public");
+    expect(publicShare.share.token).toBeUndefined();
+    expect(publicShare.attachments[0].download_url).toContain(`/api/public/shares/${share.token}/attachments/`);
+
+    const blob = await fetchApp(`http://flaremo.test${publicShare.attachments[0].download_url}`);
+    expect(blob.ok).toBe(true);
+    expect(await blob.text()).toBe("shared attachment");
+
+    const otherMemo = await createMemo("not shared");
+    const otherFormData = new FormData();
+    otherFormData.set("memo", otherMemo.name);
+    otherFormData.set("file", new File(["not shared"], "private.txt", { type: "text/plain" }));
+    const otherAttachment = await json(
+      await fetchApp("http://flaremo.test/api/v1/attachments", {
+        method: "POST",
+        body: otherFormData,
+      }),
+    );
+    const forbiddenBlob = await fetchApp(
+      `http://flaremo.test/api/public/shares/${share.token}/attachments/${otherAttachment.id}/blob`,
+    );
+    expect(forbiddenBlob.status).toBe(404);
+
+    await json(
+      await fetchApp(`http://flaremo.test/api/v1/${memo.name}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ status: "archived" }),
+      }),
+    );
+    const archivedShare = await fetchApp(`http://flaremo.test/api/public/shares/${share.token}`);
+    expect(archivedShare.status).toBe(404);
+  });
 });
 
 function fetchApp(input: string, init?: RequestInit) {

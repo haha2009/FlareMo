@@ -183,6 +183,11 @@ CF-Access-Client-Id: <client id>
 CF-Access-Client-Secret: <client secret>
 ```
 
+公开分享路径单独处理。`/share/*` 和 `/api/public/shares/*` 需要在
+Cloudflare Access application 上配置 `bypass` policy，让未登录访问者
+能打开分享页。这个旁路只针对公开分享入口；分享内容仍由 FlareMo 的
+share token、过期时间和 memo 状态校验控制。
+
 ### 生态兼容
 
 - 为 FlareMo 暴露的 `/api/v1` 维护 OpenAPI 文档。

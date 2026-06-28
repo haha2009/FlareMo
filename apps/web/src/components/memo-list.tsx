@@ -58,9 +58,9 @@ export function MemoList({
   return (
     <div className="flex flex-col gap-3">
       {memos.map((memo) => (
-        <MemoCard
-          key={memo.name}
+        <MemoListItem
           attachments={attachmentsByMemo.get(memo.name) ?? []}
+          key={memo.name}
           memo={memo}
           share={sharesByMemo.get(memo.name)}
           onArchive={onArchive}
@@ -73,5 +73,39 @@ export function MemoList({
         />
       ))}
     </div>
+  );
+}
+
+function MemoListItem({
+  memo,
+  attachments,
+  share,
+  onArchive,
+  onPin,
+  onShare,
+  onUpdate,
+  onTrash,
+  onRestore,
+  onHardDelete,
+}: Omit<MemoListProps, "isLoading" | "memos" | "attachmentsByMemo" | "sharesByMemo"> & {
+  memo: Memo;
+  attachments: Attachment[];
+  share?: Share;
+}) {
+  const shareUrl = share ? `${globalThis.location.origin}/share/${share.token}` : undefined;
+  return (
+    <MemoCard
+      attachments={attachments}
+      memo={memo}
+      share={share}
+      shareUrl={shareUrl}
+      onArchive={onArchive}
+      onHardDelete={onHardDelete}
+      onPin={onPin}
+      onRestore={onRestore}
+      onShare={onShare}
+      onTrash={onTrash}
+      onUpdate={onUpdate}
+    />
   );
 }

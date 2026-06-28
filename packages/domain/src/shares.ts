@@ -1,7 +1,7 @@
 import type { CreateShareInput } from "@flaremo/contracts";
 import type { FlareMoDb, UserRow } from "@flaremo/db";
-import { shares } from "@flaremo/db";
-import { and, eq, or } from "drizzle-orm";
+import { attachments, memos, shares, users } from "@flaremo/db";
+import { and, eq, isNull, or } from "drizzle-orm";
 import { NotFoundError, ValidationError } from "./errors";
 import { createResourceId, createToken, parseResourceName } from "./ids";
 import { getMemoById } from "./memos";
@@ -49,4 +49,42 @@ export async function getShareByIdOrToken(db: FlareMoDb, user: UserRow, idOrToke
 
 export async function listShares(db: FlareMoDb, user: UserRow) {
   return db.select().from(shares).where(eq(shares.userId, user.id));
+}
+
+export async function getPublicShareByToken(db: FlareMoDb, token: string) {
+  const share = await db.query.shares.findFirst({
+    where: eq(shares.token, token),
+  });
+
+  if (!share) {
+    throw new NotFoundError("Share not found");
+  }
+
+  if (share.expiresAt && new Date(share.expiresAt).getTime() <= Date.now()) {
+    throw new NotFoundError("Share not found");
+  }
+
+  const [memo, user, attachmentRows] = await Promise.all([
+    db.query.memos.findFirst({
+      where: and(eq(memos.id, share.memoId), eq(memos.userId, share.userId), eq(memos.status, "normal")),
+    }),
+    db.query.users.findFirst({
+      where: eq(users.id, share.userId),
+    }),
+    db
+      .select()
+      .from(attachments)
+      .where(and(eq(attachments.memoId, share.memoId), eq(attachments.userId, share.userId), isNull(attachments.deletedAt))),
+  ]);
+
+  if (!memo || !user) {
+    throw new NotFoundError("Share not found");
+  }
+
+  return {
+    share,
+    memo,
+    user,
+    attachments: attachmentRows,
+  };
 }

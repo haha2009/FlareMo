@@ -4,6 +4,7 @@ import {
   createMemo,
   createShare,
   exportData,
+  getPublicShare,
   hardDeleteMemo,
   importData,
   listMemoAttachments,
@@ -21,10 +22,10 @@ import { Input } from "@/components/ui/input";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { getAllTags } from "@/lib/memo";
+import { extractTags, formatMemoTime, getAllTags } from "@/lib/memo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
-import { DownloadIcon, SearchIcon, UploadIcon } from "lucide-react";
+import { createRootRoute, createRoute, createRouter, Outlet, RouterProvider } from "@tanstack/react-router";
+import { DownloadIcon, FileIcon, SearchIcon, UploadIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -284,16 +285,75 @@ function FlareMoApp() {
 }
 
 const rootRoute = createRootRoute({
-  component: FlareMoApp,
+  component: () => <Outlet />,
 });
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
+  component: FlareMoApp,
+});
+
+function PublicSharePage() {
+  const { token } = shareRoute.useParams();
+  const shareQuery = useQuery({
+    queryKey: ["public-share", token],
+    queryFn: () => getPublicShare(token),
+  });
+  const share = shareQuery.data;
+  const tags = share ? share.memo.payload.tags ?? extractTags(share.memo.content) : [];
+
+  return (
+    <div className="min-h-svh bg-background px-4 py-6">
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+        <header className="border-b pb-4">
+          <div className="font-heading text-lg font-semibold">FlareMo</div>
+          <div className="text-sm text-muted-foreground">Shared memo</div>
+        </header>
+        {shareQuery.isLoading && <div className="rounded-md border p-6 text-sm text-muted-foreground">Loading...</div>}
+        {shareQuery.isError && <div className="rounded-md border p-6 text-sm text-muted-foreground">Share not found.</div>}
+        {share && (
+          <article className="rounded-md border bg-card p-5 shadow-sm">
+            <div className="mb-4 text-sm text-muted-foreground">{formatMemoTime(share.memo.display_time)}</div>
+            <div className="whitespace-pre-wrap text-base leading-7">{share.memo.content}</div>
+            {tags.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <span className="rounded-md border px-2 py-1 text-xs text-muted-foreground" key={tag}>
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+            {share.attachments.length > 0 && (
+              <div className="mt-5 flex flex-col gap-2">
+                {share.attachments.map((attachment) => (
+                  <a
+                    className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+                    href={attachment.download_url}
+                    key={attachment.name}
+                  >
+                    <FileIcon />
+                    <span className="min-w-0 flex-1 truncate">{attachment.filename}</span>
+                  </a>
+                ))}
+              </div>
+            )}
+          </article>
+        )}
+      </main>
+    </div>
+  );
+}
+
+const shareRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/share/$token",
+  component: PublicSharePage,
 });
 
 const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute]),
+  routeTree: rootRoute.addChildren([indexRoute, shareRoute]),
 });
 
 declare module "@tanstack/react-router" {

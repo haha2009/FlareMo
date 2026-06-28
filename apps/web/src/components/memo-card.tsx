@@ -43,6 +43,7 @@ type MemoCardProps = {
   onRestore: (id: string) => void;
   onHardDelete: (id: string) => void;
   share?: Share;
+  shareUrl?: string;
 };
 
 export function MemoCard({
@@ -56,6 +57,7 @@ export function MemoCard({
   onRestore,
   onHardDelete,
   share,
+  shareUrl,
 }: MemoCardProps) {
   const id = getMemoResourceId(memo);
   const tags = memo.payload.tags ?? extractTags(memo.content);
@@ -137,7 +139,9 @@ export function MemoCard({
         )}
         {share && (
           <div className="mt-4 rounded-md border px-3 py-2 text-xs text-muted-foreground">
-            Share token: <span className="font-mono">{share.token}</span>
+            <a className="font-mono hover:text-foreground" href={shareUrl ?? `/share/${share.token}`}>
+              {shareUrl ?? `/share/${share.token}`}
+            </a>
           </div>
         )}
       </CardContent>

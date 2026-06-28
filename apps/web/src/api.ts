@@ -52,6 +52,12 @@ export type Share = {
   create_time: string;
 };
 
+export type PublicShare = {
+  share: Omit<Share, "token">;
+  memo: Memo;
+  attachments: Attachment[];
+};
+
 export type ListMemosResponse = {
   memos: Memo[];
   next_page_token?: string;
@@ -165,6 +171,10 @@ export async function createShare(memo: string) {
     method: "POST",
     body: JSON.stringify({}),
   });
+}
+
+export async function getPublicShare(token: string) {
+  return apiRequest<PublicShare>(`/api/public/shares/${encodeURIComponent(token)}`);
 }
 
 export async function exportData() {
