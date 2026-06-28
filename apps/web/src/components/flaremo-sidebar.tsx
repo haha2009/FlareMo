@@ -10,17 +10,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
-import { ArchiveIcon, InboxIcon, SearchIcon, Trash2Icon } from "lucide-react";
+import { ArchiveIcon, InboxIcon, Trash2Icon } from "lucide-react";
 
 export type MemoView = "all" | "archived" | "trashed";
 
 type FlareMoSidebarProps = {
   activeView: MemoView;
   onViewChange: (view: MemoView) => void;
-  tags: string[];
-  activeTag?: string;
-  onTagChange: (tag?: string) => void;
   memoCount: number;
   archivedCount: number;
   trashedCount: number;
@@ -29,9 +25,6 @@ type FlareMoSidebarProps = {
 export function FlareMoSidebar({
   activeView,
   onViewChange,
-  tags,
-  activeTag,
-  onTagChange,
   memoCount,
   archivedCount,
   trashedCount,
@@ -39,19 +32,22 @@ export function FlareMoSidebar({
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
-        <div className="flex min-w-0 flex-col gap-1 px-2 py-1">
+        <div className="flex min-w-0 items-center gap-2 px-2 py-1.5">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
+            F
+          </div>
           <div className="truncate font-heading text-lg font-semibold">FlareMo</div>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Views</SidebarGroupLabel>
+          <SidebarGroupLabel>导航</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton isActive={activeView === "all"} onClick={() => onViewChange("all")}>
                   <InboxIcon />
-                  <span>Timeline</span>
+                  <span>时间线</span>
                   <Badge className="ml-auto" variant="secondary">
                     {memoCount}
                   </Badge>
@@ -60,7 +56,7 @@ export function FlareMoSidebar({
               <SidebarMenuItem>
                 <SidebarMenuButton isActive={activeView === "archived"} onClick={() => onViewChange("archived")}>
                   <ArchiveIcon />
-                  <span>Archived</span>
+                  <span>归档</span>
                   <Badge className="ml-auto" variant="outline">
                     {archivedCount}
                   </Badge>
@@ -69,37 +65,12 @@ export function FlareMoSidebar({
               <SidebarMenuItem>
                 <SidebarMenuButton isActive={activeView === "trashed"} onClick={() => onViewChange("trashed")}>
                   <Trash2Icon />
-                  <span>Trash</span>
+                  <span>回收站</span>
                   <Badge className="ml-auto" variant="outline">
                     {trashedCount}
                   </Badge>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Tags</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton isActive={!activeTag} onClick={() => onTagChange(undefined)}>
-                  <SearchIcon />
-                  <span>All tags</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              {tags.map((tag) => (
-                <SidebarMenuItem key={tag}>
-                  <SidebarMenuButton
-                    className={cn(activeTag === tag && "font-medium")}
-                    isActive={activeTag === tag}
-                    onClick={() => onTagChange(tag)}
-                  >
-                    <ArchiveIcon />
-                    <span>{tag}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

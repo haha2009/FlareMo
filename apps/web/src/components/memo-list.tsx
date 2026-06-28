@@ -34,9 +34,9 @@ export function MemoList({
   if (isLoading) {
     return (
       <div className="flex flex-col gap-3">
-        <Skeleton className="h-32 rounded-xl" />
-        <Skeleton className="h-28 rounded-xl" />
-        <Skeleton className="h-40 rounded-xl" />
+        <Skeleton className="h-32 rounded-lg" />
+        <Skeleton className="h-28 rounded-lg" />
+        <Skeleton className="h-40 rounded-lg" />
       </div>
     );
   }
@@ -48,8 +48,8 @@ export function MemoList({
           <EmptyMedia variant="icon">
             <InboxIcon />
           </EmptyMedia>
-          <EmptyTitle>Nothing here</EmptyTitle>
-          <EmptyDescription>No entries match this view.</EmptyDescription>
+          <EmptyTitle>这里还没有内容</EmptyTitle>
+          <EmptyDescription>换个筛选条件，或者先写下一条记录。</EmptyDescription>
         </EmptyHeader>
       </Empty>
     );

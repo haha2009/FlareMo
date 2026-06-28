@@ -1,11 +1,10 @@
 import type { MemoVisibility } from "@/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { extractTags } from "@/lib/memo";
-import { Loader2Icon, PaperclipIcon, SendIcon, XIcon } from "lucide-react";
+import { Globe2Icon, Loader2Icon, LockIcon, PaperclipIcon, SendIcon, ShieldIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 
 type MemoComposerProps = {
@@ -29,62 +28,47 @@ export function MemoComposer({ isPending, onSubmit }: MemoComposerProps) {
   };
 
   return (
-    <Card>
-      <CardContent>
-        <Textarea
-          aria-label="New entry"
-          className="min-h-28 resize-none border-0 px-0 text-base shadow-none focus-visible:ring-0"
-          disabled={isPending}
-          placeholder="Write..."
-          value={content}
-          onChange={(event) => setContent(event.target.value)}
-          onKeyDown={(event) => {
-            if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-              event.preventDefault();
-              submit();
-            }
-          }}
-        />
-        {files.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-3">
-            {files.map((file) => (
-              <div
-                className="flex max-w-full items-center gap-2 rounded-md border px-2 py-1 text-xs text-muted-foreground"
-                key={`${file.name}-${file.lastModified}`}
+    <section className="group relative flex w-full flex-col gap-2 rounded-lg border bg-card px-4 pt-3 pb-2 shadow-sm">
+      <Textarea
+        aria-label="新记录"
+        className="min-h-28 resize-none border-0 px-0 text-[15px] leading-7 shadow-none focus-visible:ring-0"
+        disabled={isPending}
+        placeholder="现在的想法是..."
+        value={content}
+        onChange={(event) => setContent(event.target.value)}
+        onKeyDown={(event) => {
+          if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+            event.preventDefault();
+            submit();
+          }
+        }}
+      />
+      {files.length > 0 && (
+        <div className="flex flex-wrap gap-2 border-t pt-2">
+          {files.map((file) => (
+            <div
+              className="flex max-w-full items-center gap-2 rounded-md border bg-muted/30 px-2 py-1 text-xs text-muted-foreground"
+              key={`${file.name}-${file.lastModified}`}
+            >
+              <PaperclipIcon />
+              <span className="truncate">{file.name}</span>
+              <Button
+                aria-label={`移除 ${file.name}`}
+                size="icon-xs"
+                type="button"
+                variant="ghost"
+                onClick={() => setFiles((current) => current.filter((item) => item !== file))}
               >
-                <PaperclipIcon />
-                <span className="truncate">{file.name}</span>
-                <Button
-                  aria-label={`Remove ${file.name}`}
-                  size="icon-xs"
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setFiles((current) => current.filter((item) => item !== file))}
-                >
-                  <XIcon />
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex-wrap justify-between gap-3">
-        <ToggleGroup
-          type="single"
-          value={visibility}
-          onValueChange={(value) => {
-            if (value) setVisibility(value as MemoVisibility);
-          }}
-          size="sm"
-          variant="outline"
-        >
-          <ToggleGroupItem value="private">Private</ToggleGroupItem>
-          <ToggleGroupItem value="protected">Protected</ToggleGroupItem>
-          <ToggleGroupItem value="public">Public</ToggleGroupItem>
-        </ToggleGroup>
-        <div className="flex items-center gap-2">
-          <Button asChild size="icon" variant="outline">
-            <label aria-label="Attach files">
+                <XIcon />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="flex items-center justify-between gap-2 border-t pt-2">
+        <div className="flex min-w-0 items-center gap-1">
+          <Button asChild size="icon-sm" variant="ghost">
+            <label aria-label="添加附件">
               <PaperclipIcon />
               <Input
                 className="hidden"
@@ -97,12 +81,36 @@ export function MemoComposer({ isPending, onSubmit }: MemoComposerProps) {
               />
             </label>
           </Button>
-          <Button disabled={isPending || !canSubmit} onClick={submit}>
+          <ToggleGroup
+            type="single"
+            value={visibility}
+            onValueChange={(value) => {
+              if (value) setVisibility(value as MemoVisibility);
+            }}
+            size="sm"
+            variant="outline"
+          >
+            <ToggleGroupItem aria-label="私密" title="私密" value="private">
+              <LockIcon />
+              <span className="hidden sm:inline">私密</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem aria-label="受保护" title="受保护" value="protected">
+              <ShieldIcon />
+              <span className="hidden sm:inline">受保护</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem aria-label="公开" title="公开" value="public">
+              <Globe2Icon />
+              <span className="hidden sm:inline">公开</span>
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button className="h-7 w-8 px-0 sm:w-auto sm:px-2.5" disabled={isPending || !canSubmit} size="sm" onClick={submit}>
             {isPending ? <Loader2Icon data-icon="inline-start" /> : <SendIcon data-icon="inline-start" />}
-            Save
+            <span className="hidden sm:inline">保存</span>
           </Button>
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </section>
   );
 }

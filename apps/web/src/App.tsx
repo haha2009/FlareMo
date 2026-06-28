@@ -14,6 +14,7 @@ import {
   uploadAttachment,
   type Share,
 } from "@/api";
+import { FlareMoExplorer } from "@/components/flaremo-explorer";
 import { FlareMoSidebar, type MemoView as ViewMode } from "@/components/flaremo-sidebar";
 import { MemoComposer } from "@/components/memo-composer";
 import { MemoList } from "@/components/memo-list";
@@ -69,7 +70,7 @@ function FlareMoApp() {
   const invalidateAttachments = () => queryClient.invalidateQueries({ queryKey: ["attachments"] });
   const handleMutationError = (error: Error) => {
     if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
-      toast.error("Cloudflare Access session required");
+      toast.error("需要通过 Cloudflare Access 访问");
       return;
     }
     toast.error(error.message);
@@ -83,7 +84,7 @@ function FlareMoApp() {
       files: File[];
     }) => {
       const memo = await createMemo({
-        content: input.content || "Untitled attachment",
+        content: input.content || "未命名附件",
         visibility: input.visibility,
         payload: { tags: input.tags },
         source: "web",
@@ -98,7 +99,7 @@ function FlareMoApp() {
       return memo;
     },
     onSuccess: () => {
-      toast.success("Saved");
+      toast.success("已保存");
       void invalidateMemos();
       void invalidateAttachments();
     },
@@ -108,7 +109,7 @@ function FlareMoApp() {
   const trashMutation = useMutation({
     mutationFn: trashMemo,
     onSuccess: () => {
-      toast.success("Moved to trash");
+      toast.success("已移到回收站");
       void invalidateMemos();
     },
     onError: handleMutationError,
@@ -117,7 +118,7 @@ function FlareMoApp() {
   const restoreMutation = useMutation({
     mutationFn: (id: string) => updateMemo(id, { status: "normal" }),
     onSuccess: () => {
-      toast.success("Restored");
+      toast.success("已恢复");
       void invalidateMemos();
     },
     onError: handleMutationError,
@@ -126,7 +127,7 @@ function FlareMoApp() {
   const updateMutation = useMutation({
     mutationFn: ({ id, input }: { id: string; input: Parameters<typeof updateMemo>[1] }) => updateMemo(id, input),
     onSuccess: () => {
-      toast.success("Updated");
+      toast.success("已更新");
       void invalidateMemos();
     },
     onError: handleMutationError,
@@ -135,7 +136,7 @@ function FlareMoApp() {
   const hardDeleteMutation = useMutation({
     mutationFn: hardDeleteMemo,
     onSuccess: () => {
-      toast.success("Deleted");
+      toast.success("已删除");
       void invalidateMemos();
       void invalidateAttachments();
     },
@@ -146,7 +147,7 @@ function FlareMoApp() {
     mutationFn: createShare,
     onSuccess: (share) => {
       setSharesByMemo((current) => new Map(current).set(share.memo, share));
-      toast.success("Share created");
+      toast.success("已创建分享");
     },
     onError: handleMutationError,
   });
@@ -154,7 +155,7 @@ function FlareMoApp() {
   const importMutation = useMutation({
     mutationFn: importData,
     onSuccess: (result) => {
-      toast.success(`Imported ${result.imported_memos} items`);
+      toast.success(`已导入 ${result.imported_memos} 条`);
       void invalidateMemos();
       void invalidateAttachments();
     },
@@ -173,25 +174,25 @@ function FlareMoApp() {
     <TooltipProvider>
       <SidebarProvider>
         <FlareMoSidebar
-          activeTag={activeTag}
           activeView={view}
           archivedCount={archivedMemos.length}
           memoCount={normalMemos.length}
-          tags={allTags}
           trashedCount={trashedMemos.length}
-          onTagChange={setActiveTag}
           onViewChange={setView}
         />
         <SidebarInset>
-          <div className="flex min-h-svh flex-col bg-background">
+          <div className="flex min-h-svh flex-col bg-muted/20">
             <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
-              <div className="mx-auto flex h-14 w-full max-w-4xl items-center gap-2 px-4">
+              <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-2 px-4">
                 <SidebarTrigger />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate font-heading text-base font-semibold">Timeline</div>
+                  <div className="flex items-center gap-2">
+                    <span className="hidden h-4 w-1 rounded-full bg-primary md:block" />
+                    <div className="truncate font-heading text-base font-semibold">{viewTitle(view)}</div>
+                  </div>
                 </div>
                 <Button
-                  aria-label="Export data"
+                  aria-label="导出"
                   size="icon"
                   variant="ghost"
                   onClick={async () => {
@@ -208,7 +209,7 @@ function FlareMoApp() {
                   <DownloadIcon />
                 </Button>
                 <Button asChild size="icon" variant="ghost">
-                  <label aria-label="Import data">
+                  <label aria-label="导入">
                     <UploadIcon />
                     <Input
                       accept="application/json"
@@ -224,55 +225,88 @@ function FlareMoApp() {
                     />
                   </label>
                 </Button>
-                <div className="relative hidden w-64 md:block">
+                <div className="relative hidden w-64 lg:block xl:hidden">
                   <SearchIcon className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    className="pl-8"
-                    placeholder="Search"
+                    className="h-8 pl-8"
+                    placeholder="搜索"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                   />
                 </div>
               </div>
             </header>
-            <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 px-4 py-4">
-              <div className="relative md:hidden">
-                <SearchIcon className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  className="pl-8"
-                  placeholder="Search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                />
-              </div>
-              {view === "all" && (
-                <MemoComposer
-                  isPending={createMutation.isPending}
-                  onSubmit={({ content, visibility, tags, files }) =>
-                    createMutation.mutate({
-                      content,
-                      visibility,
-                      tags,
-                      files,
-                    })
-                  }
-                />
-              )}
-              <MemoList
-                attachmentsByMemo={attachmentsQuery.data ?? new Map()}
-                isLoading={normalMemosQuery.isLoading || archivedMemosQuery.isLoading || trashedMemosQuery.isLoading}
-                memos={filteredMemos}
-                sharesByMemo={sharesByMemo}
-                onArchive={(id) => {
-                  const memo = visibleMemos.find((item) => item.name === id || item.id === id);
-                  updateMutation.mutate({ id, input: { status: memo?.state === "archived" ? "normal" : "archived" } });
-                }}
-                onHardDelete={(id) => hardDeleteMutation.mutate(id)}
-                onPin={(id, pinned) => updateMutation.mutate({ id, input: { pinned } })}
-                onRestore={(id) => restoreMutation.mutate(id)}
-                onShare={(id) => shareMutation.mutate(id)}
-                onTrash={(id) => trashMutation.mutate(id)}
-                onUpdate={(id, input) => updateMutation.mutate({ id, input })}
+            <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-4 px-4 py-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+              <section className="min-w-0">
+                <div className="mb-4 rounded-lg border bg-background p-2 xl:hidden">
+                  <div className="relative">
+                    <SearchIcon className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      className="h-8 pl-8"
+                      placeholder="搜索"
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                    />
+                  </div>
+                  {(activeTag || query.trim()) && (
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                      {activeTag && (
+                        <button className="rounded-md bg-muted px-2 py-1" type="button" onClick={() => setActiveTag(undefined)}>
+                          #{activeTag}
+                        </button>
+                      )}
+                      <button
+                        className="rounded-md px-2 py-1 hover:bg-muted hover:text-foreground"
+                        type="button"
+                        onClick={() => {
+                          setActiveTag(undefined);
+                          setQuery("");
+                        }}
+                      >
+                        清除筛选
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col gap-3">
+                  {view === "all" && (
+                    <MemoComposer
+                      isPending={createMutation.isPending}
+                      onSubmit={({ content, visibility, tags, files }) =>
+                        createMutation.mutate({
+                          content,
+                          visibility,
+                          tags,
+                          files,
+                        })
+                      }
+                    />
+                  )}
+                  <MemoList
+                    attachmentsByMemo={attachmentsQuery.data ?? new Map()}
+                    isLoading={normalMemosQuery.isLoading || archivedMemosQuery.isLoading || trashedMemosQuery.isLoading}
+                    memos={filteredMemos}
+                    sharesByMemo={sharesByMemo}
+                    onArchive={(id) => {
+                      const memo = visibleMemos.find((item) => item.name === id || item.id === id);
+                      updateMutation.mutate({ id, input: { status: memo?.state === "archived" ? "normal" : "archived" } });
+                    }}
+                    onHardDelete={(id) => hardDeleteMutation.mutate(id)}
+                    onPin={(id, pinned) => updateMutation.mutate({ id, input: { pinned } })}
+                    onRestore={(id) => restoreMutation.mutate(id)}
+                    onShare={(id) => shareMutation.mutate(id)}
+                    onTrash={(id) => trashMutation.mutate(id)}
+                    onUpdate={(id, input) => updateMutation.mutate({ id, input })}
+                  />
+                </div>
+              </section>
+              <FlareMoExplorer
+                activeTag={activeTag}
+                memos={visibleMemos}
+                query={query}
+                tags={allTags}
+                onQueryChange={setQuery}
+                onTagChange={setActiveTag}
               />
             </main>
           </div>
@@ -281,6 +315,17 @@ function FlareMoApp() {
       <Toaster />
     </TooltipProvider>
   );
+}
+
+function viewTitle(view: ViewMode) {
+  switch (view) {
+    case "archived":
+      return "归档";
+    case "trashed":
+      return "回收站";
+    default:
+      return "时间线";
+  }
 }
 
 const rootRoute = createRootRoute({
@@ -307,10 +352,10 @@ function PublicSharePage() {
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-4">
         <header className="border-b pb-4">
           <div className="font-heading text-lg font-semibold">FlareMo</div>
-          <div className="text-sm text-muted-foreground">Shared</div>
+          <div className="text-sm text-muted-foreground">分享</div>
         </header>
-        {shareQuery.isLoading && <div className="rounded-md border p-6 text-sm text-muted-foreground">Loading...</div>}
-        {shareQuery.isError && <div className="rounded-md border p-6 text-sm text-muted-foreground">Share not found.</div>}
+        {shareQuery.isLoading && <div className="rounded-md border p-6 text-sm text-muted-foreground">加载中...</div>}
+        {shareQuery.isError && <div className="rounded-md border p-6 text-sm text-muted-foreground">分享不可用。</div>}
         {share && (
           <article className="rounded-md border bg-card p-5 shadow-sm">
             <div className="mb-4 text-sm text-muted-foreground">{formatMemoTime(share.memo.display_time)}</div>
