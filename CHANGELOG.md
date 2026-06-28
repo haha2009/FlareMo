@@ -2,6 +2,29 @@
 
 FlareMo 使用 SemVer。每个 release 都要写清楚升级影响、Cloudflare 资源变化和 Memos 兼容面变化。
 
+## v0.1.2
+
+Deploy Button 实测记录补强版本。这个版本不改变运行时代码，只把 Cloudflare Dashboard 真实创建页的验证结果写进仓库。
+
+### 已包含
+
+- 更新 `docs/deploy-button-test.md`，记录 Chrome 登录态下进入 Workers `deploy-to-workers` 创建页的实际结果。
+- 记录 Cloudflare 能解析 FlareMo 的项目名、D1/R2 binding、环境变量、构建命令和部署命令。
+- 记录测试时如何把 D1/R2 从现有生产资源切到独立新建测试资源，避免误连生产数据。
+- 记录完整部署当前被 `Connect a Git account to continue.` 挡住，需要先在 Cloudflare Dashboard 连接 GitHub/GitLab provider。
+
+### 约束
+
+- 不新增 Cloudflare 资源。
+- 不新增 D1 migration。
+- 不改变 Memos 兼容 API。
+- 不静默执行 Git provider OAuth 授权。
+
+### 升级说明
+
+- 代码部署不需要额外操作。
+- 如果要完整跑通 Deploy Button，需要先在 Cloudflare Dashboard 连接 GitHub 或 GitLab provider。
+
 ## v0.1.1
 
 开源项目基础设施补强版本。这个版本不改变部署架构，重点是让仓库首页、验证脚本、备份演练、兼容测试和发版流程更可信。
