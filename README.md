@@ -7,6 +7,8 @@
 [![Powered by Cloudflare](https://img.shields.io/badge/powered%20by-Cloudflare-F38020?logo=cloudflare&logoColor=white)](https://www.cloudflare.com/)
 [![Memos compatible](https://img.shields.io/badge/Memos-compatible-0466c1)](https://github.com/usememos/memos)
 
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/realchendahuang/FlareMo)
+
 FlareMo 是一个部署在 Cloudflare 上的个人知识管理系统。前端参考 Flomo 的快速记录和安静时间线；对外保留 Memos 风格的资源命名、数据形状和 `/api/v1` 接口；内部实现按 Cloudflare Workers、D1、R2 重新写。
 
 它不需要 VPS、Docker、Postgres、Node 常驻进程，也不在应用里维护一套 Bearer token 登录。人的访问交给 Cloudflare Access，脚本和兼容客户端通过 Cloudflare Access Service Token 进来。
@@ -93,8 +95,7 @@ FlareMo 保留 Memos 风格的核心实体：
 
 ```bash
 pnpm install
-pnpm db:generate
-pnpm exec wrangler d1 migrations apply flaremo --local
+pnpm migrate:local
 pnpm dev
 ```
 
@@ -108,21 +109,35 @@ http://localhost:8787
 
 ## 部署
 
-先创建 Cloudflare 资源：
+一键部署：
+
+```md
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/realchendahuang/FlareMo)
+```
+
+Cloudflare 会读取 `wrangler.jsonc`，创建 Worker，并为 D1 / R2 资源生成绑定。部署后执行 D1 migrations：
+
+```bash
+pnpm migrate:remote
+```
+
+手动部署时先创建资源：
 
 ```bash
 pnpm exec wrangler d1 create flaremo
 pnpm exec wrangler r2 bucket create flaremo-attachments
-pnpm exec wrangler d1 migrations apply flaremo --remote
 ```
 
-把真实 `database_id` 写入 `wrangler.jsonc` 后部署：
+把 D1 输出的 `database_id` 写入 `wrangler.jsonc`，再执行：
 
 ```bash
+pnpm verify
+pnpm deploy:dry-run
+pnpm migrate:remote
 pnpm deploy
 ```
 
-部署后，Wrangler 会输出 Worker 地址。生产实例建议放在 Cloudflare Access 后面。
+完整部署说明见 [docs/deploy.md](./docs/deploy.md)。Agent 部署说明见 [docs/agent-deploy.md](./docs/agent-deploy.md)。
 
 ## Cloudflare Access
 
@@ -160,25 +175,29 @@ curl "$FLAREMO_URL/api/v1/mcp" \
 
 ## 项目状态
 
-已完成：
+FlareMo 当前已经具备：
 
-- Cloudflare Worker + Vite 一体部署。
-- D1 schema 和 Drizzle migrations。
-- memo、user、attachment、relation、share、setting 基础领域服务。
-- Memos 兼容 API 子集。
-- Flomo 风格的记录和时间线 UI。
+- 可部署的 Cloudflare Worker + Workers Static Assets 一体应用。
+- D1 + Drizzle schema 和 migrations。
 - R2 附件。
-- 导入导出。
-- OpenAPI。
-- MCP。
-- Cloudflare Access 访问边界。
+- Memos 兼容 API 子集、导入导出、OpenAPI 和 MCP。
+- Flomo 风格的快速记录和时间线 UI。
+- Cloudflare Access 生产访问边界。
+- Deploy to Cloudflare 按钮。
+- Agent 部署 runbook、发版规则、兼容矩阵和开源协作文件。
 
-待做：
+后续方向见 [ROADMAP.md](./ROADMAP.md)。Memos 兼容范围见 [docs/memos-compatibility.md](./docs/memos-compatibility.md)。
 
-- 语义搜索。
-- AI 回顾和相关笔记。
-- 补齐 Memos API 兼容测试。
-- 客户端兼容性文档。
+## 工程化
+
+项目不使用 GitHub Actions 作为 CI。发布前由维护者在本地执行：
+
+```bash
+pnpm verify
+pnpm deploy:dry-run
+```
+
+发版规则见 [docs/release.md](./docs/release.md)。维护手册见 [docs/maintenance.md](./docs/maintenance.md)。贡献说明见 [CONTRIBUTING.md](./CONTRIBUTING.md)。安全策略见 [SECURITY.md](./SECURITY.md)。
 
 ## 参考项目
 

@@ -4,3 +4,5 @@ dist/
 .wrangler/
 .dev.vars*
 *.tsbuildinfo
+test-results/
+playwright-report/

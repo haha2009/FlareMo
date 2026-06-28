@@ -66,7 +66,7 @@ FlareMo 对外提供 Memos 兼容 API，但内部实现是 FlareMo-native 和 Cl
 - [TanStack Router](https://tanstack.com/router/latest)：提供类型安全路由和 search params 状态管理。
 - [shadcn/ui](https://ui.shadcn.com/docs)：作为可复制、可改造的组件基础，不是封闭组件库。
 - [Cloudflare Access for Workers](https://developers.cloudflare.com/workers/configuration/routing/workers-dev/#manage-access-to-workersdev)：可以保护 `workers.dev` 和 Preview URL，并通过 Access policy 限制访问者。
-- [Cloudflare Access Service Tokens](https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/)：用于 CI、脚本、MCP 等非交互式访问。
+- [Cloudflare Access Service Tokens](https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/)：用于自动化脚本、MCP 和 Memos-compatible 客户端等非交互式访问。
 - [Cloudflare R2](https://developers.cloudflare.com/r2/)：用于大体积非结构化对象。
 - [Workers KV](https://developers.cloudflare.com/kv/concepts/how-kv-works/)：适合高读、可缓存、最终一致的数据，不作为主数据库。
 - [Cloudflare Vectorize](https://developers.cloudflare.com/vectorize/)：用于 embedding 和语义搜索索引，不作为权威业务数据源。

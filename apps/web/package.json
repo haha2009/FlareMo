@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc -b --pretty false",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run --config ../../vitest.config.ts --passWithNoTests",
     "preview": "vite preview"
   },
   "dependencies": {
