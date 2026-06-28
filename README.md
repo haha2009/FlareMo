@@ -214,10 +214,11 @@ curl "$FLAREMO_URL/api/v1/mcp" \
 
 - `/share/*`
 - `/api/public/shares/*`
+- `/assets/*`
 
-这两个路径允许未登录访问者打开分享内容，但仍由 FlareMo 的 share
-token、过期时间和 memo 状态校验控制。其他 API 和前端入口继续放在
-Cloudflare Access 之后。
+这些路径允许未登录访问者打开分享页并加载前端静态资源，但分享内容
+仍由 FlareMo 的 share token、过期时间和 memo 状态校验控制。其他 API
+和前端入口继续放在 Cloudflare Access 之后。
 
 ## 建设清单
 
