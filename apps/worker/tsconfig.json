@@ -12,5 +12,6 @@
     { "path": "../../packages/domain" },
     { "path": "../../packages/memos" }
   ],
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"]
 }

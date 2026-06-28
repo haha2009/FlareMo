@@ -145,6 +145,18 @@ FlareMo 有两层 API。
 
 这一层在支持范围内保留 Memos 兼容的资源命名和响应字段。
 
+脚本、MCP 和 Memos-compatible 客户端通过 Cloudflare Access Service
+Token 调用这一层。客户端只发送 Cloudflare Access 要求的两个头：
+
+```bash
+CF-Access-Client-Id: <client id>
+CF-Access-Client-Secret: <client secret>
+```
+
+FlareMo 不接受也不签发应用内 Bearer token。生产实例的正确做法是在
+Cloudflare Access application 上增加 `non_identity` policy，并用
+`service_token` selector 绑定允许访问的 Service Token。
+
 ### FlareMo 原生 API
 
 `/api/app/*` 服务 FlareMo 自己的前端。

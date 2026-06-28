@@ -1,7 +1,9 @@
+import { createOpenApiDocument } from "@flaremo/contracts";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { HonoBindings } from "./context";
 import { appApi } from "./routes/app-api";
+import { mcpApi } from "./routes/mcp";
 import { memosApi } from "./routes/memos-api";
 
 const app = new Hono<HonoBindings>();
@@ -17,6 +19,10 @@ app.use(
 
 app.route("/api/app", appApi);
 app.route("/api/v1", memosApi);
+app.route("/api/v1", mcpApi);
+
+app.get("/openapi.json", (c) => c.json(createOpenApiDocument()));
+app.get("/api/v1/openapi.json", (c) => c.json(createOpenApiDocument()));
 
 app.notFound((c) => {
   if (c.req.path.startsWith("/api/")) {

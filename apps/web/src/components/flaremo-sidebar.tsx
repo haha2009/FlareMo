@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ArchiveIcon, InboxIcon, SearchIcon, Trash2Icon } from "lucide-react";
 
-export type MemoView = "all" | "trashed";
+export type MemoView = "all" | "archived" | "trashed";
 
 type FlareMoSidebarProps = {
   activeView: MemoView;
@@ -22,6 +22,7 @@ type FlareMoSidebarProps = {
   activeTag?: string;
   onTagChange: (tag?: string) => void;
   memoCount: number;
+  archivedCount: number;
   trashedCount: number;
 };
 
@@ -32,6 +33,7 @@ export function FlareMoSidebar({
   activeTag,
   onTagChange,
   memoCount,
+  archivedCount,
   trashedCount,
 }: FlareMoSidebarProps) {
   return (
@@ -53,6 +55,15 @@ export function FlareMoSidebar({
                   <span>Timeline</span>
                   <Badge className="ml-auto" variant="secondary">
                     {memoCount}
+                  </Badge>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton isActive={activeView === "archived"} onClick={() => onViewChange("archived")}>
+                  <ArchiveIcon />
+                  <span>Archived</span>
+                  <Badge className="ml-auto" variant="outline">
+                    {archivedCount}
                   </Badge>
                 </SidebarMenuButton>
               </SidebarMenuItem>

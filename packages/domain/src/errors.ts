@@ -14,3 +14,17 @@ export class NotFoundError extends DomainError {
     this.name = "NotFoundError";
   }
 }
+
+export class ValidationError extends DomainError {
+  constructor(message = "Invalid request") {
+    super(message, 400);
+    this.name = "ValidationError";
+  }
+}
+
+export class ConflictError extends DomainError {
+  constructor(message = "Resource conflict") {
+    super(message, 409);
+    this.name = "ConflictError";
+  }
+}

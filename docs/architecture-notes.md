@@ -157,7 +157,12 @@ FlareMo 对外暴露 Memos-compatible `/api/v1`。公共兼容面包括：
 - `POST /api/v1/attachments`
 - `GET /api/v1/attachments`
 - `GET /api/v1/{name=attachments/*}`
+- `GET /api/v1/{name=attachments/*}/blob`
 - `DELETE /api/v1/{name=attachments/*}`
+- `GET /api/v1/export`
+- `POST /api/v1/import`
+- `GET /openapi.json`
+- `POST /api/v1/mcp`
 
 同时支持：
 
@@ -167,6 +172,16 @@ FlareMo 对外暴露 Memos-compatible `/api/v1`。公共兼容面包括：
 - 常见排序参数：`order_by`。
 - 常见状态过滤：`state`。
 - 常见 filter 表达式。
+
+Service Token 访问是 Cloudflare Access 层的职责，不进入 FlareMo
+业务代码。生产实例应在 Access application 上配置 `non_identity`
+policy，并用 `service_token` selector 绑定允许访问的 token。客户端
+只需要发送：
+
+```bash
+CF-Access-Client-Id: <client id>
+CF-Access-Client-Secret: <client secret>
+```
 
 ### 生态兼容
 

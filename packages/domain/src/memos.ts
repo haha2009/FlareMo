@@ -3,6 +3,7 @@ import type { FlareMoDb, MemoPayload, MemoRow, UserRow } from "@flaremo/db";
 import { memos } from "@flaremo/db";
 import { and, desc, eq, gt, inArray, like, lt, sql } from "drizzle-orm";
 import { NotFoundError } from "./errors";
+import { createResourceId } from "./ids";
 
 export type MemoListResult = {
   memos: MemoRow[];
@@ -121,10 +122,6 @@ export async function moveMemoToTrash(db: FlareMoDb, user: UserRow, id: string):
 export async function hardDeleteMemo(db: FlareMoDb, user: UserRow, id: string): Promise<void> {
   await getMemoById(db, user, id, { includeDeleted: true });
   await db.delete(memos).where(and(eq(memos.id, id), eq(memos.userId, user.id)));
-}
-
-function createResourceId(prefix: "memos") {
-  return `${prefix}/${crypto.randomUUID()}`;
 }
 
 function normalizeMemoPayload(payload: unknown): MemoPayload {

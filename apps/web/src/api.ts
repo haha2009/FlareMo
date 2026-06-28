@@ -27,11 +27,38 @@ export type Memo = {
   update_time: string;
   display_time: string;
   creator: string;
+  attachments?: Attachment[];
+};
+
+export type Attachment = {
+  name: string;
+  id: string;
+  memo: string | null;
+  filename: string;
+  content_type: string | null;
+  size: number;
+  payload: Record<string, unknown>;
+  create_time: string;
+  update_time: string;
+  download_url: string;
+};
+
+export type Share = {
+  name: string;
+  id: string;
+  memo: string;
+  token: string;
+  expires_at: string | null;
+  create_time: string;
 };
 
 export type ListMemosResponse = {
   memos: Memo[];
   next_page_token?: string;
+};
+
+export type ListAttachmentsResponse = {
+  attachments: Attachment[];
 };
 
 export type CreateMemoRequest = {
@@ -104,13 +131,62 @@ export async function hardDeleteMemo(id: string) {
   });
 }
 
+export async function uploadAttachment(input: { file: File; memo?: string }) {
+  const formData = new FormData();
+  formData.set("file", input.file);
+  if (input.memo) {
+    formData.set("memo", input.memo);
+  }
+  return apiRequest<Attachment>("/api/v1/attachments", {
+    method: "POST",
+    body: formData,
+  });
+}
+
+export async function listMemoAttachments(memo: string) {
+  return apiRequest<ListAttachmentsResponse>(`/api/v1/memos/${encodeURIComponent(memo)}/attachments`);
+}
+
+export async function bindMemoAttachments(memo: string, attachments: string[]) {
+  return apiRequest<ListAttachmentsResponse>(`/api/v1/memos/${encodeURIComponent(memo)}/attachments`, {
+    method: "PATCH",
+    body: JSON.stringify({ attachments }),
+  });
+}
+
+export async function deleteAttachment(id: string) {
+  return apiRequest<{ ok: true }>(`/api/v1/attachments/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+}
+
+export async function createShare(memo: string) {
+  return apiRequest<Share>(`/api/v1/memos/${encodeURIComponent(memo)}/shares`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
+export async function exportData() {
+  return apiRequest<unknown>("/api/v1/export");
+}
+
+export async function importData(bundle: unknown) {
+  return apiRequest<{ imported_memos: number; imported_relations: number; imported_shares: number }>("/api/v1/import", {
+    method: "POST",
+    body: JSON.stringify(bundle),
+  });
+}
+
 async function apiRequest<T>(path: string, init: RequestInit = {}) {
+  const headers = new Headers(init.headers);
+  if (!(init.body instanceof FormData) && !headers.has("content-type")) {
+    headers.set("content-type", "application/json");
+  }
+
   const response = await fetch(path, {
     ...init,
-    headers: {
-      "content-type": "application/json",
-      ...init.headers,
-    },
+    headers,
   });
 
   const contentType = response.headers.get("content-type") ?? "";
