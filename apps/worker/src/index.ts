@@ -1,26 +1,29 @@
 import { createOpenApiDocument } from "@flaremo/contracts";
 import { Hono } from "hono";
-import { cors } from "hono/cors";
 import type { HonoBindings } from "./context";
 import { appApi } from "./routes/app-api";
 import { mcpApi } from "./routes/mcp";
 import { memosApi } from "./routes/memos-api";
 import { publicApi } from "./routes/public-api";
+import { authRoutes } from "./routes/auth";
+import { authMiddleware, isPublicPath } from "./auth/middleware";
 
 const app = new Hono<HonoBindings>();
 
-app.use(
-  "/api/*",
-  cors({
-    origin: "*",
-    allowHeaders: [
-      "content-type",
-      "cf-access-client-id",
-      "cf-access-client-secret",
-    ],
-    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-  }),
-);
+app.use("*", async (c, next) => {
+  const origin = c.req.raw.headers.get("Origin");
+  if (origin && origin !== new URL(c.req.url).origin) {
+    const allowed = isPublicPath(c.req.path);
+    if (!allowed) {
+      return c.json({ error: { message: "Forbidden origin" } }, 403);
+    }
+  }
+  await next();
+});
+
+app.route("/api/auth", authRoutes);
+
+app.use("/api/*", authMiddleware);
 
 app.route("/api/app", appApi);
 app.route("/api/public", publicApi);

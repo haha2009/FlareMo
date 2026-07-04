@@ -1,0 +1,6 @@
+<svg width="862" height="102" viewBox="0 0 8620 1017" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMid meet">
+  <!-- fill="white" is intentional: this SVG is consumed via CSS mask-image,
+       where white=visible and black=transparent (inverted from normal SVG).
+       Using fill="black" hides the entire wordmark. -->
+  <text x="0" y="850" font-family="'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="900" font-size="980" letter-spacing="-30" fill="white">FlareMo</text>
+</svg>

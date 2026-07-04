@@ -6,3 +6,4 @@ export * from "./memos";
 export * from "./relations";
 export * from "./shares";
 export * from "./users";
+export * from "./access-password";

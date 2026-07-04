@@ -2,6 +2,34 @@
 
 FlareMo 使用 SemVer。每个 release 都要写清楚升级影响、Cloudflare 资源变化和 Memos 兼容面变化。
 
+## v0.1.5
+
+单用户密码认证入口版本。新增登录/注册流程、AuthGate 拦截、hasOwner 自动分流。从 NodeWarden 源码集成 auth UI 组件（LGPL-3.0，仅登录相关文件，已适配 React + Tailwind v4）。
+
+### 已包含
+
+- feat: 单用户密码认证入口，源码集成 NodeWarden auth UI（LGPL-3.0）
+- feat: AuthGate 登录拦截 + hasOwner 自动分流（无 owner → 注册页，有 owner → 登录页）
+- feat: LoginPage + ChangePasswordForm 单用户密码管理
+- fix: vite proxy 开发时剥 Origin 头，解决添加 memo 报 403 的问题
+- fix: wordmark SVG fill 在 CSS mask 模式下不可见的问题
+- fix: 前端 "需要通过 Cloudflare Access 访问" 误报文案改为 "会话已过期"
+- chore: CLAUDE.md 加入 D1 数据库保护规则，防止下次重蹈覆辙
+- chore: 本地 wrangler dev 端口显式写作 8787，防止 port drift
+
+### 约束
+
+- 不新增 Cloudflare 资源。
+- 不新增 D1 migration（drizzle 表结构与 v0.1.4 一致）。
+- 不改变 Memos 兼容 API 路径。
+- 生产访问边界仍是 Cloudflare Access（单用户密码代替了零信任，但 Access 作为可选层保留）。
+
+### 升级说明
+
+- 代码部署不需要额外 Cloudflare 操作。
+- `CLAUDE.md` 新增 D1 保护规则，后续开发不重置数据库。
+- 自托管升级按常规流程执行 `pnpm verify`、`pnpm deploy:dry-run` 和 `pnpm deploy`。
+
 ## v0.1.4
 
 开源项目成熟度补强版本。这个版本不改变部署架构，重点是补齐公开协作、双语入口、工程门禁、Memos 生态兼容记录和 GitHub 仓库治理。

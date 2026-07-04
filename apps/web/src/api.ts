@@ -99,6 +99,53 @@ export class ApiError extends Error {
   }
 }
 
+export type AuthStatus = { authenticated: boolean; hasOwner: boolean };
+
+export async function checkAuthStatus(): Promise<AuthStatus> {
+  return apiRequest<AuthStatus>("/api/auth/status");
+}
+
+export async function login(password: string): Promise<void> {
+  await apiRequest<void>("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ password }),
+  });
+}
+
+export async function logout(): Promise<void> {
+  await apiRequest<void>("/api/auth/logout", {
+    method: "POST",
+  });
+}
+
+export async function register(input: {
+  name: string;
+  password: string;
+  hint?: string;
+}): Promise<void> {
+  await apiRequest<void>("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function getPasswordHint(): Promise<string | null> {
+  const result = await apiRequest<{ hint: string | null }>("/api/auth/password-hint", {
+    method: "POST",
+  });
+  return result.hint;
+}
+
+export async function changePassword(input: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<void> {
+  await apiRequest<void>("/api/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
 export async function listMemos(params: ListMemoParams = {}) {
   const query = new URLSearchParams();
   query.set("page_size", "50");
@@ -212,6 +259,7 @@ async function apiRequest<T>(path: string, init: RequestInit = {}) {
   const response = await fetch(path, {
     ...init,
     headers,
+    credentials: "include",
   });
 
   const contentType = response.headers.get("content-type") ?? "";
@@ -222,12 +270,20 @@ async function apiRequest<T>(path: string, init: RequestInit = {}) {
     if (isJson) {
       const body = (await response.json()) as { error?: { message?: string } };
       message = body.error?.message ?? message;
+    } else if (response.status === 401) {
+      message = "Unauthorized";
     }
     throw new ApiError(message, response.status);
   }
 
   if (!isJson) {
-    throw new ApiError("Cloudflare Access session required", 401);
+    const text = await response.text().catch(() => "");
+    throw new ApiError(
+      text.startsWith("<!") || text.startsWith("<html")
+        ? "API endpoint not reachable. Is the worker running on :8787?"
+        : "Session expired, please sign in again",
+      401,
+    );
   }
 
   return (await response.json()) as T;

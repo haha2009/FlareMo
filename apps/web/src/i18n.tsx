@@ -8,12 +8,12 @@ import {
 } from "react";
 
 export type Locale = "zh-CN" | "en-US";
+export type TranslationKey = keyof (typeof messages)["zh-CN"];
 
 const LOCALE_STORAGE_KEY = "flaremo.locale";
 
 const messages = {
   "zh-CN": {
-    "app.name": "FlareMo",
     "common.search": "搜索",
     "common.clearFilters": "清除筛选",
     "common.save": "保存",
@@ -68,7 +68,7 @@ const messages = {
     "explorer.heatmapDay": "{date}: {count}",
     "share.title": "分享",
     "share.unavailable": "分享不可用。",
-    "toast.accessRequired": "需要通过 Cloudflare Access 访问",
+    "toast.accessRequired": "会话已过期，请重新登录",
     "toast.untitledAttachment": "未命名附件",
     "toast.saved": "已保存",
     "toast.movedToTrash": "已移到回收站",
@@ -77,6 +77,55 @@ const messages = {
     "toast.deleted": "已删除",
     "toast.shareCreated": "已创建分享",
     "toast.imported": "已导入 {count} 条",
+    "login.title": "请输入访问密码",
+    "login.password": "密码",
+    "login.passwordPlaceholder": "输入密码",
+    "login.submit": "登录",
+    "login.loading": "登录中...",
+    "login.invalidCredentials": "密码错误",
+    "login.networkError": "网络错误，请重试",
+    "auth.statusLoading": "检查登录状态...",
+    "auth.login": "登录",
+    "auth.email": "邮箱",
+    "auth.name": "姓名",
+    "auth.masterPassword": "访问密码",
+    "auth.confirmMasterPassword": "确认密码",
+    "auth.passwordHintOptional": "密码提示（可选）",
+    "auth.passwordHintPlaceholder": "帮助你记住密码的提示",
+    "auth.passwordHint": "密码提示",
+    "auth.showPasswordHint": "显示密码提示",
+    "auth.loadingPasswordHint": "加载中...",
+    "auth.invalidField": "输入无效",
+    "auth.loggingIn": "登录中...",
+    "auth.unlocking": "正在解锁...",
+    "auth.unlock": "解锁",
+    "auth.unlockVault": "解锁保险库",
+    "auth.unlockWithPasskey": "使用 Passkey 解锁",
+    "auth.loginWithPasskey": "使用 Passkey 登录",
+    "auth.online": "在线",
+    "auth.offline": "离线",
+    "auth.inviteCodeRequired": "邀请码（必填）",
+    "auth.loginFailed": "登录失败",
+    "auth.alreadyConfigured": "已设置过密码，请直接登录",
+    "auth.logout": "退出登录",
+    "auth.registerFailed": "注册失败",
+    "auth.registrationSuccess": "注册成功，请登录",
+    "auth.createAccount": "创建账户",
+    "auth.registering": "正在创建...",
+    "auth.or": "或",
+    "auth.backToLogin": "返回登录",
+    "auth.passwordsDoNotMatch": "两次输入的密码不一致",
+    "auth.passwordTooShort": "密码至少需要12个字符",
+    "auth.changePassword": "修改密码",
+    "auth.currentPassword": "当前密码",
+    "auth.newPassword": "新密码",
+    "auth.confirmNewPassword": "确认新密码",
+    "auth.currentPasswordRequired": "请输入当前密码",
+    "auth.newPasswordRequired": "请输入新密码",
+    "auth.passwordsMustMatch": "两次输入的新密码不一致",
+    "auth.changePasswordSuccess": "密码修改成功",
+    "auth.changePasswordFailed": "修改密码失败",
+    "auth.changePasswordIncorrect": "当前密码不正确",
   },
   "en-US": {
     "app.name": "FlareMo",
@@ -134,7 +183,7 @@ const messages = {
     "explorer.heatmapDay": "{date}: {count}",
     "share.title": "Share",
     "share.unavailable": "This share is unavailable.",
-    "toast.accessRequired": "Cloudflare Access session required",
+    "toast.accessRequired": "Session expired, please sign in again",
     "toast.untitledAttachment": "Untitled attachment",
     "toast.saved": "Saved",
     "toast.movedToTrash": "Moved to trash",
@@ -143,17 +192,64 @@ const messages = {
     "toast.deleted": "Deleted",
     "toast.shareCreated": "Share created",
     "toast.imported": "Imported {count} notes",
+    "login.title": "Enter access password",
+    "login.password": "Password",
+    "login.passwordPlaceholder": "Enter password",
+    "login.submit": "Sign in",
+    "login.loading": "Signing in...",
+    "login.invalidCredentials": "Invalid password",
+    "login.networkError": "Network error, please retry",
+    "auth.statusLoading": "Checking login status...",
+    "auth.login": "Log In",
+    "auth.email": "Email",
+    "auth.name": "Name",
+    "auth.masterPassword": "Master Password",
+    "auth.confirmMasterPassword": "Confirm Master Password",
+    "auth.passwordHintOptional": "Password Hint (optional)",
+    "auth.passwordHintPlaceholder": "A hint to help you remember",
+    "auth.passwordHint": "Password Hint",
+    "auth.showPasswordHint": "Show password hint",
+    "auth.loadingPasswordHint": "Loading...",
+    "auth.invalidField": "Invalid input",
+    "auth.loggingIn": "Logging in...",
+    "auth.unlocking": "Unlocking...",
+    "auth.unlock": "Unlock",
+    "auth.unlockVault": "Unlock Vault",
+    "auth.unlockWithPasskey": "Unlock with Passkey",
+    "auth.loginWithPasskey": "Log in with Passkey",
+    "auth.online": "Online",
+    "auth.offline": "Offline",
+    "auth.inviteCodeRequired": "Invite Code (Required)",
+    "auth.loginFailed": "Login failed",
+    "auth.alreadyConfigured": "Password already set, please log in",
+    "auth.logout": "Sign out",
+    "auth.registerFailed": "Registration failed",
+    "auth.createAccount": "Create Account",
+    "auth.registering": "Creating account...",
+    "auth.or": "or",
+    "auth.backToLogin": "Back to Login",
+    "auth.passwordTooShort": "Password must be at least 12 characters",
+    "auth.passwordsDoNotMatch": "Passwords do not match",
+    "auth.changePassword": "Change Password",
+    "auth.currentPassword": "Current Password",
+    "auth.newPassword": "New Password",
+    "auth.confirmNewPassword": "Confirm New Password",
+    "auth.currentPasswordRequired": "Current password required",
+    "auth.newPasswordRequired": "New password required",
+    "auth.passwordsMustMatch": "Passwords must match",
+    "auth.changePasswordSuccess": "Password changed successfully",
+    "auth.changePasswordFailed": "Failed to change password",
+    "auth.changePasswordIncorrect": "Current password is incorrect",
   },
-} as const satisfies Record<Locale, Record<string, string>>;
+} as Record<Locale, Record<string, string>>;
 
-export type TranslationKey = keyof (typeof messages)["zh-CN"];
 type TranslationParams = Record<string, string | number>;
 
 type I18nContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   toggleLocale: () => void;
-  t: (key: TranslationKey, params?: TranslationParams) => string;
+  t: (key: string, params?: TranslationParams) => string;
 };
 
 const I18nContext = createContext<I18nContextValue | null>(null);
@@ -167,7 +263,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [locale]);
 
   const value = useMemo<I18nContextValue>(() => {
-    const t = (key: TranslationKey, params?: TranslationParams) =>
+    const t = (key: string, params?: TranslationParams) =>
       interpolate(messages[locale][key], params);
     const toggleLocale = () =>
       setLocale((current) => (current === "zh-CN" ? "en-US" : "zh-CN"));

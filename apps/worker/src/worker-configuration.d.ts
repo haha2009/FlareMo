@@ -7,6 +7,8 @@ interface __BaseEnv_Env {
 	ASSETS: Fetcher;
 	FLAREMO_SINGLE_USER_EMAIL: "owner@flaremo.local";
 	FLAREMO_SINGLE_USER_NAME: "FlareMo Owner";
+	FLAREMO_JWT_SECRET: string;
+	FLAREMO_ACCESS_PASSWORD_HASH: string;
 }
 declare namespace Cloudflare {
 	interface GlobalProps {
@@ -19,7 +21,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "FLAREMO_SINGLE_USER_EMAIL" | "FLAREMO_SINGLE_USER_NAME">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "FLAREMO_SINGLE_USER_EMAIL" | "FLAREMO_SINGLE_USER_NAME" | "FLAREMO_JWT_SECRET" | "FLAREMO_ACCESS_PASSWORD_HASH">> {}
 }
 
 // Begin runtime types

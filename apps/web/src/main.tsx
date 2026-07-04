@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "@/components/theme-provider.tsx";
 import { I18nProvider } from "@/i18n.tsx";
+import { AuthGate } from "@/components/AuthGate";
 
 import "./index.css";
 import App from "./App.tsx";
@@ -19,7 +20,9 @@ createRoot(root).render(
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <ThemeProvider>
-          <App />
+          <AuthGate>
+            <App />
+          </AuthGate>
         </ThemeProvider>
       </I18nProvider>
     </QueryClientProvider>
