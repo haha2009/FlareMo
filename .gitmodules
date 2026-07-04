@@ -1,3 +1,0 @@
-[submodule "apps/web/nodewarden-webapp"]
-	path = apps/web/nodewarden-webapp
-	url = https://github.com/haha2009/nodewarden.git
